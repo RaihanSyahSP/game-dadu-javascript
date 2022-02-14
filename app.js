@@ -1,34 +1,34 @@
 /*
-GAME RULES:
+PERATURAN PERMAINAN:
 
-- The game has 2 players, playing in rounds
-- In each turn, a player rolls a dice as many times as he whishes. Each result get added to his ROUND score
-- BUT, if the player rolls a 1, all his ROUND score gets lost. After that, it's the next player's turn
-- The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
-- The first player to reach 100 points on GLOBAL score wins the game
-- Player win when he got double six
+- game ini terdiri dari 2 pemain
+- setiap pemain memiliki score awal 0
+- setiap pemain memiliki kesempatan 3 kali untuk mengambil dadu, lebih dari itu maka pemain lain yang akan bermain
+- jika pemain menahan tombol hold,maka score sementara akan ditambahkan ke score keseluruhan pemain tersebut
+- jika ia mendapatkan dadu no satu dalam tiga kali kesemptana, maka score sementara yang dikumpulkan akan hilang dan pemain berikutnya yang mendapatkan giliran
+- pemain akan menang jika mencapai score 100 atau mencapai sesuai dengan yang diinputkan pemain di input field final score
+- jika beruntung mendapatkan dua dadu no 6 maka pemain tersebut akan menang
 */
 
-var scores, roundScore, activePlayer, gamePlaying, currentRoll;
+let scores, roundScore, activePlayer, gamePlaying, currentRoll;
 
 init();
 
-var lastDice;
 
 let tombolRoll = document.querySelector(".btn-roll").addEventListener("click", function () {
   if (gamePlaying) {
-    // 1. Random number
-    var dice1 = Math.floor(Math.random() * 6) + 1;
-    var dice2 = Math.floor(Math.random() * 6) + 1;
+    // 1. random angka dadu
+    let dice1 = Math.floor(Math.random() * 6) + 1;
+    let dice2 = Math.floor(Math.random() * 6) + 1;
 
-    // 2. Display th result
+    // 2. menampilkan dadu
     document.getElementById("dice-1").style.display = "block";
     document.getElementById("dice-2").style.display = "block";
 
     document.getElementById("dice-1").src = "dice-" + dice1 + ".png";
     document.getElementById("dice-2").src = "dice-" + dice2 + ".png";
 
-    // 3. Update the round score IF the rolled number was NOT 1
+    // 3. Update score
     if (dice1 == 6 && dice2 == 6) {
       winner();
       document.querySelector("#current-" + activePlayer).textContent = "You Got Double Six!";
@@ -36,13 +36,12 @@ let tombolRoll = document.querySelector(".btn-roll").addEventListener("click", f
       // add score
       roundScore += dice1 + dice2;
       document.querySelector("#current-" + activePlayer).textContent = roundScore;
-      if (currentRoll == 0) {
+      if (currentRoll == 1) {
         nextPlayer();
         return (currentRoll = 3);
       } else {
         currentRoll--;
       }
-      console.log(currentRoll);
       document.querySelector("#chances").value = currentRoll;
     } else {
       // next player
@@ -55,24 +54,26 @@ let tombolRoll = document.querySelector(".btn-roll").addEventListener("click", f
 
 document.querySelector(".btn-hold").addEventListener("click", function () {
   if (gamePlaying) {
-    // ADD CURRENT score to GLOBAL score
+    // menambahkan score sementara ke score keseluruhan
     scores[activePlayer] += roundScore;
 
-    // Update the UI
+    // Update UI
     document.querySelector("#score-" + activePlayer).textContent = scores[activePlayer];
 
-    var input = document.querySelector(".final-score").value;
-    var winningScore;
+    let input = document.querySelector(".final-score").value;
+    currentRoll = 3;
+    document.querySelector("#chances").value = currentRoll;
+    let winningScore;
 
-    // undefined, 0, null or "" are COERCED to FALSE
-    // anything else is COERCED to TRUE
+    // input undefined, 0, null or "" adalah FALSE
+    //  selain itu akan TRUE
     if (input) {
       winningScore = input;
     } else {
       winningScore = 100;
     }
 
-    // check if player WON the game
+    // check jika pemain memenangkan permainan
     if (scores[activePlayer] >= winningScore) {
       winner();
     } else {
@@ -96,6 +97,7 @@ function nextPlayer() {
   roundScore = 0;
   currentRoll = 3;
 
+  document.querySelector("#chances").value = currentRoll;
   document.getElementById("current-0").textContent = "0";
   document.getElementById("current-1").textContent = "0";
 
